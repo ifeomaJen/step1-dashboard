@@ -3,193 +3,549 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Step 1 Smart Dashboard</title>
+  <title>Step 1 Command Center</title>
   <style>
     :root{
-      --bg:#f7f8fc;
-      --card:#ffffff;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --accent:#4f46e5;
-      --accent2:#06b6d4;
-      --border:#e5e7eb;
-      --good:#15803d;
-      --warn:#b45309;
-      --bad:#b91c1c;
-      --shadow:0 10px 28px rgba(15,23,42,.08);
-      --radius:16px;
+      --bg:#081120;
+      --bg2:#0d1730;
+      --card:#101b35;
+      --card2:#132245;
+      --text:#eef4ff;
+      --muted:#a8b7d9;
+      --line:rgba(255,255,255,.08);
+      --blue:#60a5fa;
+      --blue2:#38bdf8;
+      --red:#fb7185;
+      --pink:#f9a8d4;
+      --purple:#a78bfa;
+      --green:#34d399;
+      --yellow:#fbbf24;
+      --shadow:0 18px 50px rgba(0,0,0,.35);
+      --radius:22px;
     }
+
     *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
     body{
       margin:0;
-      font-family:Arial, sans-serif;
-      background:linear-gradient(180deg,#eef2ff 0%, var(--bg) 20%);
+      font-family: Inter, Arial, Helvetica, sans-serif;
       color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(96,165,250,.16), transparent 22%),
+        radial-gradient(circle at top right, rgba(249,168,212,.12), transparent 18%),
+        radial-gradient(circle at bottom right, rgba(251,113,133,.10), transparent 18%),
+        linear-gradient(180deg, #060d1c 0%, #0b1430 45%, #07101f 100%);
+      min-height:100vh;
     }
-    .container{
-      max-width:1200px;
-      margin:auto;
-      padding:20px;
+
+    .shell{
+      max-width:1380px;
+      margin:0 auto;
+      padding:22px 16px 48px;
     }
-    h1{margin:0 0 8px}
-    .sub{color:var(--muted); margin-bottom:18px}
-    .grid{
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+      border:1px solid var(--line);
+      border-radius:30px;
+      padding:26px 24px;
+      background:
+        linear-gradient(135deg, rgba(96,165,250,.16), rgba(167,139,250,.10) 40%, rgba(251,113,133,.10)),
+        rgba(255,255,255,.03);
+      box-shadow:var(--shadow);
+      margin-bottom:18px;
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 85% 20%, rgba(255,255,255,.08), transparent 16%),
+        radial-gradient(circle at 20% 100%, rgba(56,189,248,.10), transparent 20%);
+      pointer-events:none;
+    }
+
+    .hero-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:18px;
+      flex-wrap:wrap;
+      position:relative;
+      z-index:1;
+    }
+
+    .kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:999px;
+      color:#d8e5ff;
+      background:rgba(255,255,255,.04);
+      font-size:.85rem;
+      margin-bottom:12px;
+    }
+
+    .hero h1{
+      margin:0;
+      font-size:clamp(2rem, 5vw, 4rem);
+      line-height:1;
+      letter-spacing:-.04em;
+    }
+
+    .hero-sub{
+      margin-top:10px;
+      color:var(--muted);
+      max-width:760px;
+      line-height:1.6;
+      font-size:1rem;
+    }
+
+    .hero-badges{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:16px;
+    }
+
+    .badge{
+      padding:10px 14px;
+      border-radius:999px;
+      font-size:.9rem;
+      border:1px solid rgba(255,255,255,.1);
+      background:rgba(255,255,255,.05);
+      color:#e7efff;
+    }
+
+    .mission-box{
+      min-width:260px;
+      padding:18px;
+      border-radius:22px;
+      background:rgba(4,10,25,.45);
+      border:1px solid rgba(255,255,255,.08);
+      backdrop-filter:blur(10px);
+    }
+
+    .mission-label{
+      color:var(--muted);
+      font-size:.82rem;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .mission-count{
+      font-size:clamp(2.4rem, 6vw, 4rem);
+      line-height:1;
+      font-weight:800;
+      margin:8px 0 4px;
+      color:#fff;
+    }
+
+    .mission-note{
+      color:#d6e3ff;
+      font-size:.95rem;
+    }
+
+    .dashboard{
       display:grid;
       grid-template-columns:repeat(12,1fr);
       gap:16px;
     }
+
     .card{
-      background:var(--card);
-      border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.025));
+      border:1px solid var(--line);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
       padding:18px;
+      min-width:0;
     }
+
     .span-12{grid-column:span 12}
     .span-8{grid-column:span 8}
+    .span-7{grid-column:span 7}
     .span-6{grid-column:span 6}
+    .span-5{grid-column:span 5}
     .span-4{grid-column:span 4}
     .span-3{grid-column:span 3}
-    @media(max-width:900px){
-      .span-8,.span-6,.span-4,.span-3{grid-column:span 12}
+
+    @media (max-width: 1100px){
+      .span-8,.span-7,.span-6,.span-5,.span-4,.span-3{grid-column:span 12}
     }
-    h2{margin:0 0 12px; font-size:1.1rem}
-    h3{margin:16px 0 8px; font-size:.95rem; color:var(--muted)}
-    label{
-      display:block;
+
+    .card h2{
+      margin:0 0 12px;
+      font-size:1.15rem;
+      letter-spacing:-.02em;
+    }
+
+    .section-sub{
+      color:var(--muted);
       font-size:.9rem;
+      margin-bottom:14px;
+      line-height:1.5;
+    }
+
+    .countdown-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+    }
+
+    @media (max-width: 800px){
+      .countdown-grid{grid-template-columns:1fr}
+    }
+
+    .countdown-box{
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .countdown-box::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:3px;
+      background:linear-gradient(90deg, var(--blue), var(--purple), var(--red));
+    }
+
+    .count-title{
+      color:var(--muted);
+      font-size:.86rem;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .count-value{
+      font-size:3rem;
+      font-weight:800;
+      line-height:1;
       margin:10px 0 6px;
-      color:#374151;
     }
-    input, select, textarea{
+
+    .count-caption{
+      color:#dce7ff;
+      font-size:.92rem;
+    }
+
+    .progress-track{
+      height:12px;
       width:100%;
-      border:1px solid #d1d5db;
-      border-radius:10px;
-      padding:10px 12px;
-      font-size:.95rem;
-      background:#fff;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      overflow:hidden;
+      margin-top:14px;
+      border:1px solid rgba(255,255,255,.05);
     }
-    textarea{min-height:80px; resize:vertical}
+
+    .progress-fill{
+      height:100%;
+      border-radius:999px;
+      width:0%;
+      background:linear-gradient(90deg, var(--blue), var(--blue2));
+      transition:width .4s ease;
+    }
+
+    .progress-fill.pink{background:linear-gradient(90deg, var(--pink), var(--red))}
+    .progress-fill.green{background:linear-gradient(90deg, var(--green), #22c55e)}
+    .progress-label{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:.82rem;
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+    }
+
+    .phase-box{
+      min-height:240px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)),
+        radial-gradient(circle at top right, rgba(96,165,250,.14), transparent 20%);
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:18px;
+      line-height:1.7;
+      color:#e8f0ff;
+      white-space:pre-wrap;
+    }
+
     .row{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:12px;
     }
-    @media(max-width:700px){
+
+    @media (max-width: 700px){
       .row{grid-template-columns:1fr}
     }
-    button{
-      border:none;
-      border-radius:12px;
-      padding:10px 14px;
-      background:var(--accent);
-      color:#fff;
-      font-weight:600;
-      cursor:pointer;
-      margin-top:12px;
-      margin-right:8px;
+
+    label{
+      display:block;
+      font-size:.88rem;
+      color:#dce8ff;
+      margin:10px 0 6px;
     }
-    button.secondary{background:#111827}
-    button.ghost{background:#eef2ff; color:var(--accent)}
-    .pill{
-      display:inline-block;
-      padding:6px 10px;
-      border-radius:999px;
-      background:#eef2ff;
-      color:var(--accent);
-      font-size:.85rem;
-      font-weight:600;
-      margin:4px 8px 0 0;
-    }
-    .metric{
-      font-size:1.6rem;
-      font-weight:700;
-      margin-top:4px;
-    }
-    .output{
-      background:#f9fafb;
-      border:1px dashed #cbd5e1;
-      border-radius:12px;
-      padding:12px;
-      margin-top:12px;
-      white-space:pre-wrap;
-    }
-    .small{font-size:.88rem}
-    .muted{color:var(--muted)}
-    .good{color:var(--good)}
-    .warn{color:var(--warn)}
-    .bad{color:var(--bad)}
-    .table{
+
+    input, select, textarea{
       width:100%;
-      border-collapse:collapse;
-      margin-top:10px;
+      padding:12px 14px;
+      border-radius:14px;
+      background:#0b1430;
+      color:#eff5ff;
+      border:1px solid rgba(255,255,255,.08);
+      outline:none;
+      font-size:.95rem;
     }
-    .table th,.table td{
-      border-bottom:1px solid var(--border);
-      text-align:left;
-      padding:8px 6px;
-      font-size:.92rem;
-      vertical-align:top;
-    }
-    .banner{
+
+    input::placeholder, textarea::placeholder{color:#7f90b5}
+    textarea{min-height:96px; resize:vertical}
+
+    .button-row{
       display:flex;
       flex-wrap:wrap;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    button{
+      border:none;
+      border-radius:14px;
+      padding:12px 16px;
+      font-weight:700;
+      cursor:pointer;
+      color:white;
+      background:linear-gradient(90deg, var(--blue), var(--purple));
+      box-shadow:0 8px 20px rgba(96,165,250,.22);
+    }
+
+    button.secondary{
+      background:linear-gradient(90deg, #182748, #213466);
+      box-shadow:none;
+      border:1px solid rgba(255,255,255,.07);
+    }
+
+    button.danger{
+      background:linear-gradient(90deg, #e11d48, #fb7185);
+      box-shadow:0 8px 20px rgba(251,113,133,.18);
+    }
+
+    .output{
+      margin-top:14px;
+      border:1px dashed rgba(255,255,255,.1);
+      border-radius:18px;
+      padding:14px;
+      color:#eaf1ff;
+      background:rgba(255,255,255,.03);
+      white-space:pre-wrap;
+      line-height:1.65;
+    }
+
+    .resource-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+    }
+
+    @media (max-width: 900px){
+      .resource-grid{grid-template-columns:1fr}
+    }
+
+    .resource-bar{
+      margin-top:14px;
+      padding:14px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:rgba(255,255,255,.025);
+    }
+
+    .resource-header{
+      display:flex;
       justify-content:space-between;
       gap:10px;
       align-items:center;
-      background:linear-gradient(90deg,#eef2ff 0%, #ecfeff 100%);
+      margin-bottom:10px;
+      flex-wrap:wrap;
     }
-    .mini{
-      background:#f9fafb;
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:10px;
+
+    .resource-name{
+      font-weight:700;
+    }
+
+    .resource-value{
+      color:#dbe7ff;
+      font-size:.92rem;
+    }
+
+    .resource-track{
+      height:12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      overflow:hidden;
       margin-top:8px;
     }
-    ul{margin:8px 0 0 18px}
+
+    .resource-fill{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background:linear-gradient(90deg, var(--blue), var(--purple));
+      transition:width .4s ease;
+    }
+
+    .resource-fill.red{background:linear-gradient(90deg, #f43f5e, #fb7185)}
+    .resource-fill.cyan{background:linear-gradient(90deg, #06b6d4, #60a5fa)}
+    .resource-fill.green{background:linear-gradient(90deg, #10b981, #34d399)}
+
+    .table-wrap{
+      overflow:auto;
+      margin-top:12px;
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:18px;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:720px;
+    }
+
+    th, td{
+      padding:12px 10px;
+      text-align:left;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      font-size:.92rem;
+    }
+
+    th{
+      color:#bdd0f8;
+      background:rgba(255,255,255,.03);
+      position:sticky;
+      top:0;
+    }
+
+    .tiny{
+      font-size:.82rem;
+      color:var(--muted);
+      line-height:1.5;
+    }
+
+    .pattern-box{
+      min-height:200px;
+      border-radius:18px;
+      padding:16px;
+      background:
+        radial-gradient(circle at top right, rgba(56,189,248,.08), transparent 20%),
+        rgba(255,255,255,.025);
+      border:1px solid var(--line);
+      white-space:pre-wrap;
+      line-height:1.7;
+    }
+
+    .footer-note{
+      margin-top:14px;
+      color:var(--muted);
+      font-size:.85rem;
+    }
+
+    .divider{
+      height:1px;
+      background:rgba(255,255,255,.08);
+      margin:14px 0;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Step 1 Smart Dashboard</h1>
-    <div class="sub">Decision assistant for Step 1 + CBSE + school</div>
+  <div class="shell">
 
-    <div class="grid">
-      <div class="card span-12 banner">
+    <section class="hero">
+      <div class="hero-top">
         <div>
-          <span class="pill">Today: <span id="todayText"></span></span>
-          <span class="pill">UWorld reset: Apr 3, 2026</span>
-          <span class="pill">CBSE: Apr 17, 2026</span>
-          <span class="pill">Step target: May 15, 2026</span>
+          <div class="kicker">🫀 STEP 1 COMMAND CENTER · Mission Mode</div>
+          <h1>Ready. Refined. Relentless.</h1>
+          <div class="hero-sub">
+            Your personal Step 1 control room for CBSE, UWorld reset, weak-area repair, and daily execution.
+            No more spiraling. No more resource chaos. Just focused wins from today to test day.
+          </div>
+          <div class="hero-badges">
+            <div class="badge">Today: <span id="todayText"></span></div>
+            <div class="badge">CBSE: Apr 17, 2026</div>
+            <div class="badge">UWorld reset: Apr 3, 2026</div>
+            <div class="badge">Step target: May 15, 2026</div>
+          </div>
         </div>
-        <div class="small muted">Goal: reduce decision fatigue and tell you what matters most today.</div>
+
+        <div class="mission-box">
+          <div class="mission-label">Main Countdown</div>
+          <div class="mission-count"><span id="daysStepMain">-</span></div>
+          <div class="mission-note">days until Step 1 target</div>
+          <div class="divider"></div>
+          <div class="tiny">Mission rule: show up, execute the next block, and let repetition do its work.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard">
+
+      <div class="card span-12">
+        <h2>Countdown Mission Panel</h2>
+        <div class="section-sub">This is your timeline at a glance. Use it to stay grounded, not panicked.</div>
+
+        <div class="countdown-grid">
+          <div class="countdown-box">
+            <div class="count-title">UWorld Reset</div>
+            <div class="count-value" id="daysReset">-</div>
+            <div class="count-caption">Target mixed-mode shift</div>
+            <div class="progress-track"><div class="progress-fill cyan" id="resetBar"></div></div>
+            <div class="progress-label"><span>Now → Apr 3</span><span id="resetPctLabel">0%</span></div>
+          </div>
+
+          <div class="countdown-box">
+            <div class="count-title">CBSE</div>
+            <div class="count-value" id="daysCBSE">-</div>
+            <div class="count-caption">Pre-dedicated proving ground</div>
+            <div class="progress-track"><div class="progress-fill pink" id="cbseBar"></div></div>
+            <div class="progress-label"><span>Mar 31 → Apr 17</span><span id="cbsePctLabel">0%</span></div>
+          </div>
+
+          <div class="countdown-box">
+            <div class="count-title">Step 1</div>
+            <div class="count-value" id="daysStep">-</div>
+            <div class="count-caption">Final mission target</div>
+            <div class="progress-track"><div class="progress-fill green" id="stepBar"></div></div>
+            <div class="progress-label"><span>Mar 31 → May 15</span><span id="stepPctLabel">0%</span></div>
+          </div>
+        </div>
       </div>
 
-      <div class="card span-3">
-        <h2>Countdowns</h2>
-        <div>Reset</div>
-        <div class="metric" id="daysReset">-</div>
-        <div style="margin-top:12px">CBSE</div>
-        <div class="metric" id="daysCBSE">-</div>
-        <div style="margin-top:12px">Step 1</div>
-        <div class="metric" id="daysStep">-</div>
-      </div>
-
-      <div class="card span-9">
+      <div class="card span-5">
         <h2>Phase Guidance</h2>
-        <div id="phaseGuidance" class="output small"></div>
+        <div class="section-sub">What matters most right now based on your timeline.</div>
+        <div id="phaseGuidance" class="phase-box"></div>
       </div>
 
-      <div class="card span-6">
-        <h2>Input for Today's Plan</h2>
+      <div class="card span-7">
+        <h2>Today’s Mission Builder</h2>
+        <div class="section-sub">Let the app help decide what deserves your attention today.</div>
+
         <div class="row">
           <div>
             <label>Hours available today</label>
             <input id="hoursAvailable" placeholder="9.5">
           </div>
           <div>
-            <label>School / required obligations today</label>
-            <input id="obligations" placeholder="Clinical skills 1-6, meeting 7-8">
+            <label>Required obligations</label>
+            <input id="obligations" placeholder="Preceptorship 4–6, meeting 7–8">
           </div>
         </div>
 
@@ -214,16 +570,20 @@
         </div>
 
         <label>Must-do today</label>
-        <textarea id="mustDoToday" placeholder="Example: psych lectures, poster edits, Dirty Medicine biochem"></textarea>
+        <textarea id="mustDoToday" placeholder="Psych lectures, AMEC poster edits, Dirty Medicine biochem"></textarea>
 
-        <button onclick="generatePlan()">Generate Today's Plan</button>
-        <button class="ghost" onclick="savePlannerInputs()">Save Inputs</button>
+        <div class="button-row">
+          <button onclick="generatePlan()">Generate Today’s Plan</button>
+          <button class="secondary" onclick="savePlannerInputs()">Save Inputs</button>
+        </div>
 
-        <div id="todayPlanOutput" class="output small"></div>
+        <div id="todayPlanOutput" class="output"></div>
       </div>
 
-      <div class="card span-6">
-        <h2>Resource Progress</h2>
+      <div class="card span-12">
+        <h2>Resource Progress Command Center</h2>
+        <div class="section-sub">Track what you’re actually touching so your progress feels visible.</div>
+
         <div class="row">
           <div>
             <label>UWorld % complete</label>
@@ -234,6 +594,7 @@
             <input id="questionsToday" placeholder="40">
           </div>
         </div>
+
         <div class="row">
           <div>
             <label>First Aid pages total</label>
@@ -244,6 +605,7 @@
             <input id="faToday" placeholder="15">
           </div>
         </div>
+
         <div class="row">
           <div>
             <label>Bootcamp today</label>
@@ -254,6 +616,7 @@
             <input id="mehlmanToday" placeholder="33 neuro pages">
           </div>
         </div>
+
         <div class="row">
           <div>
             <label>Sketchy today</label>
@@ -264,6 +627,7 @@
             <input id="dmToday" placeholder="2 ethics + 1 biochem">
           </div>
         </div>
+
         <div class="row">
           <div>
             <label>Pathoma today</label>
@@ -274,12 +638,52 @@
             <input id="ankiToday" placeholder="280">
           </div>
         </div>
-        <button onclick="saveResources()">Save Resource Progress</button>
-        <div id="resourceOutput" class="output small"></div>
+
+        <div class="button-row">
+          <button onclick="saveResources()">Save Resource Progress</button>
+        </div>
+
+        <div id="resourceOutput" class="output"></div>
+
+        <div class="resource-grid">
+          <div class="resource-bar">
+            <div class="resource-header">
+              <div class="resource-name">UWorld Completion</div>
+              <div class="resource-value"><span id="uworldBarText">0%</span></div>
+            </div>
+            <div class="resource-track"><div class="resource-fill" id="uworldBar"></div></div>
+          </div>
+
+          <div class="resource-bar">
+            <div class="resource-header">
+              <div class="resource-name">First Aid Progress</div>
+              <div class="resource-value"><span id="faBarText">0%</span></div>
+            </div>
+            <div class="resource-track"><div class="resource-fill cyan" id="faBar"></div></div>
+          </div>
+
+          <div class="resource-bar">
+            <div class="resource-header">
+              <div class="resource-name">Sketchy / Dirty Medicine Momentum</div>
+              <div class="resource-value">qualitative</div>
+            </div>
+            <div class="resource-track"><div class="resource-fill red" id="sketchyBar"></div></div>
+          </div>
+
+          <div class="resource-bar">
+            <div class="resource-header">
+              <div class="resource-name">Anki Daily Reinforcement</div>
+              <div class="resource-value"><span id="ankiBarText">0</span> cards</div>
+            </div>
+            <div class="resource-track"><div class="resource-fill green" id="ankiBar"></div></div>
+          </div>
+        </div>
       </div>
 
       <div class="card span-6">
         <h2>Weakness Log</h2>
+        <div class="section-sub">Log missed concepts so the app can spot your patterns.</div>
+
         <div class="row">
           <div>
             <label>System</label>
@@ -317,42 +721,41 @@
         <label>Quick note</label>
         <textarea id="weakNote" placeholder="What exactly tripped you up?"></textarea>
 
-        <button onclick="addWeakness()">Add Weakness</button>
-        <button class="ghost" onclick="clearWeaknesses()">Clear Weaknesses</button>
+        <div class="button-row">
+          <button onclick="addWeakness()">Add Weakness</button>
+          <button class="danger" onclick="clearWeaknesses()">Clear Weaknesses</button>
+        </div>
 
-        <table class="table" id="weaknessTable">
-          <thead>
-            <tr>
-              <th>System</th>
-              <th>Subtopic</th>
-              <th>Error</th>
-              <th>Contrast</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <div class="card span-6">
-        <h2>Top Weakness Patterns</h2>
-        <div id="patternOutput" class="output small"></div>
-
-        <h3>Suggested resources by weakness</h3>
-        <div class="mini small">
-          <strong>Cardio / Pulm / Repro / Renal / Endo:</strong> First Aid + UWorld + Bootcamp + Mehlman<br><br>
-          <strong>Micro:</strong> Sketchy + Anki + First Aid micro tables + UWorld<br><br>
-          <strong>Immunology / Biochem:</strong> Dirty Medicine + First Aid + targeted Bootcamp/Osmosis if needed<br><br>
-          <strong>Neuro:</strong> Lectures + First Aid + Bootcamp/BnB + Mehlman + UWorld<br><br>
-          <strong>Histology / Anatomy:</strong> First Aid images + 100 concepts + UWorld image review
+        <div class="table-wrap">
+          <table id="weaknessTable">
+            <thead>
+              <tr>
+                <th>System</th>
+                <th>Subtopic</th>
+                <th>Error</th>
+                <th>Contrast</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
 
       <div class="card span-6">
+        <h2>Pattern Detector</h2>
+        <div class="section-sub">Your highest-yield weak systems, error styles, and suggested fixes.</div>
+        <div id="patternOutput" class="pattern-box"></div>
+        <div class="footer-note">Use this section after UWorld or NBMEs to decide what gets the next study block.</div>
+      </div>
+
+      <div class="card span-6">
         <h2>Loop Closure Tracker</h2>
+        <div class="section-sub">Track what’s been exposed, reviewed, questioned, and repaired.</div>
+
         <div class="row">
           <div>
             <label>Topic</label>
-            <input id="loopTopic" placeholder="Basal ganglia / Staph lab ID / Cardio murmurs">
+            <input id="loopTopic" placeholder="Basal ganglia / murmurs / staph lab ID">
           </div>
           <div>
             <label>Status</label>
@@ -366,17 +769,25 @@
             </select>
           </div>
         </div>
-        <button onclick="addLoop()">Add Loop Item</button>
-        <table class="table" id="loopTable">
-          <thead>
-            <tr><th>Topic</th><th>Status</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+
+        <div class="button-row">
+          <button onclick="addLoop()">Add Loop Item</button>
+        </div>
+
+        <div class="table-wrap">
+          <table id="loopTable">
+            <thead>
+              <tr><th>Topic</th><th>Status</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
 
       <div class="card span-6">
-        <h2>Weekly Summary</h2>
+        <h2>Weekly Debrief</h2>
+        <div class="section-sub">Use this every Sunday to reset your next week with clarity.</div>
+
         <div class="row">
           <div>
             <label>Pathoma chapters this week</label>
@@ -387,6 +798,7 @@
             <input id="weeklyFA" placeholder="120">
           </div>
         </div>
+
         <div class="row">
           <div>
             <label>Biochem progress</label>
@@ -397,6 +809,7 @@
             <input id="weeklyGenetics" placeholder="DM 3 videos">
           </div>
         </div>
+
         <div class="row">
           <div>
             <label>Micro progress</label>
@@ -407,6 +820,7 @@
             <input id="weeklyWins" placeholder="Daily questions, neuro sprint">
           </div>
         </div>
+
         <div class="row">
           <div>
             <label>Main weak areas</label>
@@ -417,12 +831,18 @@
             <input id="weeklyTargets" placeholder="Finish cardio, start mixed blocks">
           </div>
         </div>
-        <button onclick="saveWeekly()">Save Weekly Summary</button>
-        <div id="weeklyOutput" class="output small"></div>
+
+        <div class="button-row">
+          <button onclick="saveWeekly()">Save Weekly Summary</button>
+        </div>
+
+        <div id="weeklyOutput" class="output"></div>
       </div>
 
       <div class="card span-12">
         <h2>Practice Test / Exam Log</h2>
+        <div class="section-sub">Log every assessment so your review becomes strategic, not emotional.</div>
+
         <div class="row">
           <div>
             <label>Test name</label>
@@ -433,6 +853,7 @@
             <input id="testDate" placeholder="2026-03-30">
           </div>
         </div>
+
         <div class="row">
           <div>
             <label>Score / %</label>
@@ -443,68 +864,96 @@
             <input id="testIssue" placeholder="Knew disease, missed detail">
           </div>
         </div>
-        <label>Takeaways</label>
-        <textarea id="testTakeaways" placeholder="Top 3 things to fix"></textarea>
-        <button onclick="addTest()">Add Test Log</button>
 
-        <table class="table" id="testTable">
-          <thead>
-            <tr><th>Test</th><th>Date</th><th>Score</th><th>Main issue</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <label>Top takeaways</label>
+        <textarea id="testTakeaways" placeholder="Top 3 things to fix"></textarea>
+
+        <div class="button-row">
+          <button onclick="addTest()">Add Test Log</button>
+        </div>
+
+        <div class="table-wrap">
+          <table id="testTable">
+            <thead>
+              <tr><th>Test</th><th>Date</th><th>Score</th><th>Main issue</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
-    </div>
+
+    </section>
   </div>
 
 <script>
+const TODAY_BASE = new Date('2026-03-31T00:00:00');
 const RESET_DATE = new Date('2026-04-03T00:00:00');
 const CBSE_DATE = new Date('2026-04-17T00:00:00');
 const STEP_DATE = new Date('2026-05-15T00:00:00');
 
-function daysBetween(today, target){
-  const oneDay = 1000*60*60*24;
-  const a = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const b = new Date(target.getFullYear(), target.getMonth(), target.getDate());
-  return Math.ceil((b-a)/oneDay);
-}
-
 function saveLS(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
 function getLS(key, fallback){ return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
 
-function initHeader(){
-  const today = new Date();
-  document.getElementById('todayText').textContent = today.toDateString();
-  document.getElementById('daysReset').textContent = daysBetween(today, RESET_DATE);
-  document.getElementById('daysCBSE').textContent = daysBetween(today, CBSE_DATE);
-  document.getElementById('daysStep').textContent = daysBetween(today, STEP_DATE);
+function daysBetween(a, b){
+  const oneDay = 1000 * 60 * 60 * 24;
+  const d1 = new Date(a.getFullYear(), a.getMonth(), a.getDate());
+  const d2 = new Date(b.getFullYear(), b.getMonth(), b.getDate());
+  return Math.ceil((d2 - d1) / oneDay);
+}
+
+function pctElapsed(start, end, now){
+  const total = end - start;
+  const passed = now - start;
+  if (passed <= 0) return 0;
+  if (passed >= total) return 100;
+  return Math.round((passed / total) * 100);
+}
+
+function setBar(id, pct, labelId){
+  const bar = document.getElementById(id);
+  if(bar) bar.style.width = Math.max(0, Math.min(100, pct)) + '%';
+  if(labelId) document.getElementById(labelId).textContent = pct + '%';
+}
+
+function initTop(){
+  const now = new Date();
+  document.getElementById('todayText').textContent = now.toDateString();
+  document.getElementById('daysReset').textContent = daysBetween(now, RESET_DATE);
+  document.getElementById('daysCBSE').textContent = daysBetween(now, CBSE_DATE);
+  document.getElementById('daysStep').textContent = daysBetween(now, STEP_DATE);
+  document.getElementById('daysStepMain').textContent = daysBetween(now, STEP_DATE);
+
+  setBar('resetBar', pctElapsed(TODAY_BASE, RESET_DATE, now), 'resetPctLabel');
+  setBar('cbseBar', pctElapsed(TODAY_BASE, CBSE_DATE, now), 'cbsePctLabel');
+  setBar('stepBar', pctElapsed(TODAY_BASE, STEP_DATE, now), 'stepPctLabel');
+
+  const dReset = daysBetween(now, RESET_DATE);
+  const dCBSE = daysBetween(now, CBSE_DATE);
 
   let msg = '';
-  const dReset = daysBetween(today, RESET_DATE);
-  const dCBSE = daysBetween(today, CBSE_DATE);
-  if (dReset > 0){
+  if (dReset > 0) {
     msg =
 `Current phase: exposure + weak-system tightening
 
 Now until April 2:
-- finish high-yield content exposure
-- tighten weak systems first
-- keep questions daily
-- finish Sketchy Micro + Dirty Medicine
-- use Bootcamp and Mehlman selectively
+• finish high-yield content exposure
+• tighten weak systems first
+• keep questions daily
+• finish Sketchy Micro + Dirty Medicine
+• use Bootcamp and Mehlman selectively
 
-Do NOT chase perfection.
+Do not chase perfection.
 Goal = enough exposure + enough repetition to enter mixed mode well.`;
-  } else if (dCBSE > 0){
+  } else if (dCBSE > 0) {
     msg =
 `Current phase: mixed integration for CBSE
 
 Now until April 17:
-- restart UWorld and use mixed timed blocks
-- review weak systems in focused clusters
-- keep Anki daily
-- use Mehlman after organ system review
-- protect sleep and practice calm retrieval`;
+• restart UWorld and use mixed timed blocks
+• review weak systems in focused clusters
+• keep Anki daily
+• use Mehlman after organ system review
+• protect sleep and practice calm retrieval`;
   } else {
     msg =
 `Current phase: dedicated refinement
@@ -532,6 +981,186 @@ function loadPlannerInputs(){
   priorityMode.value = d.priorityMode || 'School exam soon';
   energyLevel.value = d.energyLevel || 'Medium';
   mustDoToday.value = d.mustDoToday || '';
+}
+
+function getResourceRecommendation(system){
+  const map = {
+    "Cardio":"First Aid + UWorld + Bootcamp + Mehlman Cardio",
+    "Pulm":"First Aid + UWorld + Bootcamp + Mehlman Pulm",
+    "Renal":"First Aid + UWorld + Bootcamp + Mehlman Renal",
+    "GI":"First Aid + UWorld + Bootcamp + Mehlman GI",
+    "Repro":"First Aid + UWorld + Bootcamp + weak repro pharm review",
+    "Endo":"First Aid + UWorld + Dirty Medicine biochem/endocrine overlap + Bootcamp",
+    "Neuro":"Lectures + First Aid + Bootcamp/BnB + Mehlman Neuro + UWorld",
+    "Psych":"Lectures + First Aid psych + UWorld psych + light Bootcamp psych",
+    "Micro":"Sketchy + Anki + First Aid micro tables + UWorld",
+    "Immunology":"Dirty Medicine + First Aid + targeted Bootcamp/Osmosis + UWorld",
+    "Biochem":"Dirty Medicine + First Aid + Bootcamp biochem + UWorld",
+    "Pharm":"First Aid + question review + Kaplan/Bootcamp only for weak spots",
+    "Anatomy":"100 concepts + First Aid images + UWorld anatomy questions",
+    "Histology":"First Aid images + UWorld image review + school slides",
+    "Biostats":"First Aid + Randy Neil + UWorld/Anki",
+    "Ethics":"Dirty Medicine + UWorld + Anki",
+    "MSK":"First Aid + Pathoma + UWorld",
+    "Derm":"Pathoma ch 19 + First Aid + UWorld",
+    "Heme/Onc":"Pathoma + First Aid + UWorld"
+  };
+  return map[system] || "First Aid + UWorld + targeted review";
+}
+
+function generatePlan(){
+  savePlannerInputs();
+
+  const hours = parseFloat(hoursAvailable.value || '8');
+  const energy = energyLevel.value;
+  const priority = priorityMode.value;
+  const mustDo = mustDoToday.value.trim();
+
+  const now = new Date();
+  const dReset = daysBetween(now, RESET_DATE);
+  const dCBSE = daysBetween(now, CBSE_DATE);
+
+  const weaknesses = getLS('weaknesses', []);
+  const systemCount = {};
+  weaknesses.forEach(w => systemCount[w.system] = (systemCount[w.system] || 0) + 1);
+  const rankedSystems = Object.entries(systemCount).sort((a,b)=>b[1]-a[1]).map(x=>x[0]);
+
+  let primary = rankedSystems[0] || 'Neuro';
+  let secondary = rankedSystems[1] || 'Cardio';
+  let foundation = rankedSystems.find(x => ['Micro','Immunology','Biochem','Pharm','Biostats','Ethics','Anatomy','Histology'].includes(x)) || 'Micro';
+
+  if (priority === 'School exam soon') primary = 'Current school block';
+  if (priority === 'CBSE prep' && rankedSystems.length) primary = rankedSystems[0];
+  if (priority === 'Step weak systems' && rankedSystems.length > 1) {
+    primary = rankedSystems[0];
+    secondary = rankedSystems[1];
+  }
+  if (priority === 'Mixed integration') {
+    primary = 'Mixed weak systems';
+    secondary = 'Current school block';
+  }
+
+  let qGoal = 40;
+  if (hours >= 10) qGoal = 60;
+  if (hours >= 12) qGoal = 80;
+  if (energy === 'Low') qGoal = Math.max(20, qGoal - 20);
+
+  let mode = dReset > 0 ? 'System-leaning + weak-area exposure' : 'Mixed timed integration';
+  if (dCBSE <= 7) mode = 'CBSE crunch: mixed + weak-system repair';
+
+  const plan =
+`MISSION FOR TODAY
+
+Phase:
+• ${mode}
+
+Priority systems:
+• Primary: ${primary}
+• Secondary: ${secondary}
+• Foundation: ${foundation}
+
+Question target:
+• ${qGoal} questions
+
+Recommended structure:
+1. Primary system block (${hours >= 9 ? '3–4 hrs' : '2–3 hrs'})
+2. Secondary system block (${hours >= 9 ? '1.5–2 hrs' : '1 hr'})
+3. Foundation block (1–1.5 hrs)
+4. Questions block (${qGoal} questions)
+5. Anki / repair / review (1–2 hrs)
+
+Resource suggestions:
+• ${primary}: ${getResourceRecommendation(primary.replace('/Psych','').replace('Current school block','Neuro'))}
+• ${secondary}: ${getResourceRecommendation(secondary)}
+• ${foundation}: ${getResourceRecommendation(foundation)}
+
+Must-do:
+• ${mustDo || 'No must-do entered'}
+
+Reminder:
+• finish blocks, do not perfect them
+• questions + review are non-negotiable
+• use videos only for gaps`;
+
+  todayPlanOutput.textContent = plan;
+  saveLS('generatedPlan', plan);
+}
+
+function saveResources(){
+  const data = {
+    uworldPercent: uworldPercent.value,
+    questionsToday: questionsToday.value,
+    faTotal: faTotal.value,
+    faToday: faToday.value,
+    bootcampToday: bootcampToday.value,
+    mehlmanToday: mehlmanToday.value,
+    sketchyToday: sketchyToday.value,
+    dmToday: dmToday.value,
+    pathomaToday: pathomaToday.value,
+    ankiToday: ankiToday.value
+  };
+  saveLS('resourceProgress', data);
+
+  resourceOutput.textContent =
+`Saved:
+• UWorld: ${data.uworldPercent || '-'}%
+• Questions today: ${data.questionsToday || '-'}
+• First Aid: ${data.faToday || '-'} today / ${data.faTotal || '-'} total
+• Bootcamp: ${data.bootcampToday || '-'}
+• Mehlman: ${data.mehlmanToday || '-'}
+• Sketchy: ${data.sketchyToday || '-'}
+• Dirty Medicine: ${data.dmToday || '-'}
+• Pathoma: ${data.pathomaToday || '-'}
+• Anki: ${data.ankiToday || '-'}`;
+
+  renderResourceBars();
+}
+
+function loadResources(){
+  const d = getLS('resourceProgress', {});
+  uworldPercent.value = d.uworldPercent || '';
+  questionsToday.value = d.questionsToday || '';
+  faTotal.value = d.faTotal || '';
+  faToday.value = d.faToday || '';
+  bootcampToday.value = d.bootcampToday || '';
+  mehlmanToday.value = d.mehlmanToday || '';
+  sketchyToday.value = d.sketchyToday || '';
+  dmToday.value = d.dmToday || '';
+  pathomaToday.value = d.pathomaToday || '';
+  ankiToday.value = d.ankiToday || '';
+
+  if (Object.keys(d).length){
+    resourceOutput.textContent =
+`Saved:
+• UWorld: ${d.uworldPercent || '-'}%
+• Questions today: ${d.questionsToday || '-'}
+• First Aid: ${d.faToday || '-'} today / ${d.faTotal || '-'} total
+• Bootcamp: ${d.bootcampToday || '-'}
+• Mehlman: ${d.mehlmanToday || '-'}
+• Sketchy: ${d.sketchyToday || '-'}
+• Dirty Medicine: ${d.dmToday || '-'}
+• Pathoma: ${d.pathomaToday || '-'}
+• Anki: ${d.ankiToday || '-'}`;
+  }
+  renderResourceBars();
+}
+
+function renderResourceBars(){
+  const uw = parseFloat(uworldPercent.value || '0');
+  const fa = Math.min(100, Math.round((parseFloat(faTotal.value || '0') / 800) * 100));
+  const anki = Math.min(100, Math.round((parseFloat(ankiToday.value || '0') / 400) * 100));
+
+  document.getElementById('uworldBar').style.width = Math.max(0, Math.min(100, uw)) + '%';
+  document.getElementById('uworldBarText').textContent = uw + '%';
+
+  document.getElementById('faBar').style.width = fa + '%';
+  document.getElementById('faBarText').textContent = fa + '%';
+
+  const sketchyMomentum = (sketchyToday.value.trim() || dmToday.value.trim()) ? 70 : 15;
+  document.getElementById('sketchyBar').style.width = sketchyMomentum + '%';
+
+  document.getElementById('ankiBar').style.width = anki + '%';
+  document.getElementById('ankiBarText').textContent = ankiToday.value || '0';
 }
 
 function addWeakness(){
@@ -572,7 +1201,14 @@ function renderWeaknesses(){
 function renderPatterns(){
   const data = getLS('weaknesses', []);
   if (!data.length){
-    patternOutput.textContent = 'No weakness data yet. Add missed concepts here and this section will start highlighting your patterns.';
+    patternOutput.textContent =
+`No weakness data yet.
+
+Once you start logging misses here, this section will identify:
+• top weak systems
+• top error patterns
+• what to review next
+• which resource to use first`;
     return;
   }
 
@@ -586,174 +1222,18 @@ function renderPatterns(){
   const topSystems = Object.entries(systemCount).sort((a,b)=>b[1]-a[1]).slice(0,3);
   const topTypes = Object.entries(typeCount).sort((a,b)=>b[1]-a[1]).slice(0,2);
 
-  let text = 'Top weak systems:\n';
+  let text = 'TOP WEAK SYSTEMS\n';
   topSystems.forEach(([k,v], i) => text += `${i+1}. ${k} (${v})\n`);
 
-  text += '\nTop error patterns:\n';
+  text += '\nTOP ERROR PATTERNS\n';
   topTypes.forEach(([k,v], i) => text += `${i+1}. ${k} (${v})\n`);
 
-  text += '\nSuggested study focus:\n';
+  text += '\nRECOMMENDED NEXT REVIEW\n';
   topSystems.forEach(([sys], i) => {
-    const rec = getResourceRecommendation(sys);
-    text += `${i+1}. ${sys}: ${rec}\n`;
+    text += `${i+1}. ${sys}: ${getResourceRecommendation(sys)}\n`;
   });
 
   patternOutput.textContent = text;
-}
-
-function getResourceRecommendation(system){
-  const map = {
-    "Cardio":"First Aid + UWorld + Bootcamp + Mehlman Cardio",
-    "Pulm":"First Aid + UWorld + Bootcamp + Mehlman Pulm",
-    "Renal":"First Aid + UWorld + Bootcamp + Mehlman Renal",
-    "GI":"First Aid + UWorld + Bootcamp + Mehlman GI",
-    "Repro":"First Aid + UWorld + Bootcamp + sketch weak repro pharm",
-    "Endo":"First Aid + UWorld + Dirty Medicine biochem/endocrine overlap + Bootcamp",
-    "Neuro":"Lectures + First Aid + Bootcamp/BnB + Mehlman Neuro + UWorld",
-    "Psych":"Lectures + First Aid psych + UWorld psych + light Bootcamp psych",
-    "Micro":"Sketchy + Anki + First Aid micro tables + UWorld",
-    "Immunology":"Dirty Medicine + First Aid + targeted Bootcamp/Osmosis + UWorld",
-    "Biochem":"Dirty Medicine + First Aid + Bootcamp biochem + UWorld",
-    "Pharm":"First Aid + question review + Kaplan/Bootcamp only for weak spots",
-    "Anatomy":"100 concepts + First Aid images + UWorld anatomy questions",
-    "Histology":"First Aid images + UWorld image review + school slides",
-    "Biostats":"First Aid + Randy Neil + UWorld/Anki",
-    "Ethics":"Dirty Medicine + UWorld + Anki",
-    "MSK":"First Aid + Pathoma + UWorld",
-    "Derm":"Pathoma ch 19 + First Aid + UWorld",
-    "Heme/Onc":"Pathoma + First Aid + UWorld"
-  };
-  return map[system] || "First Aid + UWorld + targeted review";
-}
-
-function generatePlan(){
-  savePlannerInputs();
-  const hours = parseFloat(hoursAvailable.value || '8');
-  const energy = energyLevel.value;
-  const priority = priorityMode.value;
-  const mustDo = mustDoToday.value.trim();
-  const today = new Date();
-  const dReset = daysBetween(today, RESET_DATE);
-  const dCBSE = daysBetween(today, CBSE_DATE);
-
-  const weaknesses = getLS('weaknesses', []);
-  const systemCount = {};
-  weaknesses.forEach(w => systemCount[w.system] = (systemCount[w.system] || 0) + 1);
-  const rankedSystems = Object.entries(systemCount).sort((a,b)=>b[1]-a[1]).map(x=>x[0]);
-
-  let primary = rankedSystems[0] || 'Neuro';
-  let secondary = rankedSystems[1] || 'Cardio';
-  let foundation = rankedSystems.find(x => ['Micro','Immunology','Biochem','Pharm','Biostats','Ethics','Anatomy','Histology'].includes(x)) || 'Micro';
-
-  if (priority === 'School exam soon') primary = 'Neuro/Psych (school focus)';
-  if (priority === 'CBSE prep' && rankedSystems.length) primary = rankedSystems[0];
-  if (priority === 'Step weak systems' && rankedSystems.length > 1) {
-    primary = rankedSystems[0];
-    secondary = rankedSystems[1];
-  }
-  if (priority === 'Mixed integration') {
-    primary = 'Mixed weak systems';
-    secondary = 'Current school block';
-  }
-
-  let qGoal = 40;
-  if (hours >= 10) qGoal = 60;
-  if (hours >= 12) qGoal = 80;
-  if (energy === 'Low') qGoal = Math.max(20, qGoal - 20);
-
-  let mode = dReset > 0 ? 'System-leaning + weak-area exposure' : 'Mixed timed integration';
-  if (dCBSE <= 7) mode = 'CBSE crunch: mixed + weak system repair';
-
-  const plan =
-`Recommended plan for today
-
-Phase:
-- ${mode}
-
-Priority systems:
-- Primary: ${primary}
-- Secondary: ${secondary}
-- Foundation: ${foundation}
-
-Question target:
-- ${qGoal} questions
-
-Suggested blocks:
-1. Primary system block (${hours >= 9 ? '3-4 hrs' : '2-3 hrs'})
-2. Secondary system block (${hours >= 9 ? '1.5-2 hrs' : '1 hr'})
-3. Foundation block (1-1.5 hrs)
-4. Questions block (${qGoal} questions)
-5. Anki / review / repair (1-2 hrs)
-
-Resource recommendations:
-- ${primary}: ${getResourceRecommendation(primary.replace('/Psych (school focus)','').replace(' (school focus)',''))}
-- ${secondary}: ${getResourceRecommendation(secondary)}
-- ${foundation}: ${getResourceRecommendation(foundation)}
-
-Must-do today:
-- ${mustDo || 'No must-do entered'}
-
-Reminder:
-- Finish blocks, do not perfect them.
-- Questions + review are non-negotiable.
-- Use videos only for gaps.`;
-
-  todayPlanOutput.textContent = plan;
-  saveLS('generatedPlan', plan);
-}
-
-function saveResources(){
-  const data = {
-    uworldPercent: uworldPercent.value,
-    questionsToday: questionsToday.value,
-    faTotal: faTotal.value,
-    faToday: faToday.value,
-    bootcampToday: bootcampToday.value,
-    mehlmanToday: mehlmanToday.value,
-    sketchyToday: sketchyToday.value,
-    dmToday: dmToday.value,
-    pathomaToday: pathomaToday.value,
-    ankiToday: ankiToday.value
-  };
-  saveLS('resourceProgress', data);
-  resourceOutput.textContent =
-`Saved:
-UWorld: ${data.uworldPercent || '-'}%
-Questions today: ${data.questionsToday || '-'}
-First Aid: ${data.faToday || '-'} today / ${data.faTotal || '-'} total
-Bootcamp: ${data.bootcampToday || '-'}
-Mehlman: ${data.mehlmanToday || '-'}
-Sketchy: ${data.sketchyToday || '-'}
-Dirty Medicine: ${data.dmToday || '-'}
-Pathoma: ${data.pathomaToday || '-'}
-Anki: ${data.ankiToday || '-'}`;
-}
-
-function loadResources(){
-  const d = getLS('resourceProgress', {});
-  uworldPercent.value = d.uworldPercent || '';
-  questionsToday.value = d.questionsToday || '';
-  faTotal.value = d.faTotal || '';
-  faToday.value = d.faToday || '';
-  bootcampToday.value = d.bootcampToday || '';
-  mehlmanToday.value = d.mehlmanToday || '';
-  sketchyToday.value = d.sketchyToday || '';
-  dmToday.value = d.dmToday || '';
-  pathomaToday.value = d.pathomaToday || '';
-  ankiToday.value = d.ankiToday || '';
-  if (Object.keys(d).length){
-    resourceOutput.textContent =
-`Saved:
-UWorld: ${d.uworldPercent || '-'}%
-Questions today: ${d.questionsToday || '-'}
-First Aid: ${d.faToday || '-'} today / ${d.faTotal || '-'} total
-Bootcamp: ${d.bootcampToday || '-'}
-Mehlman: ${d.mehlmanToday || '-'}
-Sketchy: ${d.sketchyToday || '-'}
-Dirty Medicine: ${d.dmToday || '-'}
-Pathoma: ${d.pathomaToday || '-'}
-Anki: ${d.ankiToday || '-'}`;
-  }
 }
 
 function addLoop(){
@@ -763,6 +1243,7 @@ function addLoop(){
   loopTopic.value = '';
   renderLoops();
 }
+
 function renderLoops(){
   const tbody = document.querySelector('#loopTable tbody');
   tbody.innerHTML = '';
@@ -786,18 +1267,20 @@ function saveWeekly(){
     targets: weeklyTargets.value
   };
   saveLS('weeklySummary', data);
+
   weeklyOutput.textContent =
 `Weekly summary saved
 
-Pathoma: ${data.pathoma || '-'}
-First Aid pages: ${data.fa || '-'}
-Biochem: ${data.biochem || '-'}
-Genetics: ${data.genetics || '-'}
-Micro: ${data.micro || '-'}
-Wins: ${data.wins || '-'}
-Weak areas: ${data.weak || '-'}
-Next targets: ${data.targets || '-'}`;
+• Pathoma: ${data.pathoma || '-'}
+• First Aid pages: ${data.fa || '-'}
+• Biochem: ${data.biochem || '-'}
+• Genetics: ${data.genetics || '-'}
+• Micro: ${data.micro || '-'}
+• Wins: ${data.wins || '-'}
+• Weak areas: ${data.weak || '-'}
+• Next targets: ${data.targets || '-'}`;
 }
+
 function loadWeekly(){
   const d = getLS('weeklySummary', {});
   weeklyPathoma.value = d.pathoma || '';
@@ -812,14 +1295,14 @@ function loadWeekly(){
     weeklyOutput.textContent =
 `Weekly summary saved
 
-Pathoma: ${d.pathoma || '-'}
-First Aid pages: ${d.fa || '-'}
-Biochem: ${d.biochem || '-'}
-Genetics: ${d.genetics || '-'}
-Micro: ${d.micro || '-'}
-Wins: ${d.wins || '-'}
-Weak areas: ${d.weak || '-'}
-Next targets: ${d.targets || '-'}`;
+• Pathoma: ${d.pathoma || '-'}
+• First Aid pages: ${d.fa || '-'}
+• Biochem: ${d.biochem || '-'}
+• Genetics: ${d.genetics || '-'}
+• Micro: ${d.micro || '-'}
+• Wins: ${d.wins || '-'}
+• Weak areas: ${d.weak || '-'}
+• Next targets: ${d.targets || '-'}`;
   }
 }
 
@@ -840,6 +1323,7 @@ function addTest(){
   testTakeaways.value = '';
   renderTests();
 }
+
 function renderTests(){
   const tbody = document.querySelector('#testTable tbody');
   tbody.innerHTML = '';
@@ -852,7 +1336,7 @@ function renderTests(){
 }
 
 (function init(){
-  initHeader();
+  initTop();
   loadPlannerInputs();
   loadResources();
   renderWeaknesses();
