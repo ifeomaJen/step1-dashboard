@@ -6,26 +6,29 @@
   <title>Step 1 Command Center V3</title>
   <style>
     :root{
-      --bg:#0b0814;
-      --bg2:#140f24;
-      --panel:#171128;
-      --panel2:#1e1633;
-      --panel3:#241b3f;
-      --text:#f8f4ff;
-      --muted:#b8aecf;
-      --line:rgba(255,255,255,.08);
-      --pink:#f59ac7;
-      --pink2:#ff7eb6;
-      --purple:#b39aff;
-      --purple2:#8f7cff;
-      --blue:#7aa2ff;
-      --cyan:#86d8ff;
-      --green:#54d9a2;
-      --yellow:#ffd36e;
-      --red:#ff7e99;
-      --shadow:0 18px 45px rgba(0,0,0,.35);
+      --bg:#0c1426;
+      --bg2:#121d35;
+      --panel:#182544;
+      --panel2:#213055;
+      --panel3:#293c66;
+      --text:#f5f9ff;
+      --muted:#c1cde5;
+      --line:rgba(255,255,255,.09);
+
+      --blue:#a8d2ff;
+      --blue2:#7fb8ff;
+      --blue3:#c2deff;
+      --cyan:#a9ebff;
+      --lav:#c7d2ff;
+
+      --pink:#efb9df;
+      --green:#6fe2b7;
+      --yellow:#ffd77a;
+      --red:#ff9db2;
+
+      --shadow:0 18px 45px rgba(0,0,0,.28);
       --radius:24px;
-    }
+  }
 
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
@@ -58,6 +61,10 @@
       box-shadow:var(--shadow);
       padding:24px;
       margin-bottom:18px;
+    }
+
+    .meter-wrap {
+      margin-top:10px;
     }
 
     .hero::after{
@@ -1062,17 +1069,28 @@
   }
 
   function getRepairFocus(){
-    const loops = getLS('loops', []);
-    const weaknesses = getLS('weaknesses', []);
-    const weakLoops = loops.filter(x => x.status === 'Weak').map(x => x.topic);
-    if (weakLoops.length) return weakLoops[weakLoops.length - 1];
+  const loops = getLS('loops', []);
 
-    if (weaknesses.length){
-      const last = weaknesses[weaknesses.length - 1];
-      return `${last.system}: ${last.discipline || 'review details'}`;
-    }
-    return 'Review top recent weakness';
+  const weak = loops.filter(x => x.status === 'Weak');
+  if (weak.length) return weak[weak.length - 1].topic;
+
+  const tested = loops.filter(x => x.status === 'Tested');
+  if (tested.length) return tested[tested.length - 1].topic;
+
+  const reviewed = loops.filter(x => x.status === 'Reviewed');
+  if (reviewed.length) return reviewed[reviewed.length - 1].topic;
+
+  const exposed = loops.filter(x => x.status === 'Exposed');
+  if (exposed.length) return exposed[exposed.length - 1].topic;
+
+  const weaknesses = getLS('weaknesses', []);
+  if (weaknesses.length){
+    const last = weaknesses[weaknesses.length - 1];
+    return `${last.system}: ${last.discipline || 'review details'}`;
   }
+
+  return 'Review top recent weakness';
+}
 
   function getWeaknessOverride(primary){
     const topWeak = getTopWeakSystems();
@@ -1279,7 +1297,54 @@ Rule:
 
     todayPlanOutput.textContent = plan;
     saveLS('generatedPlan', plan);
+    updateConfidenceMeter();
   }
+  
+  function updateConfidenceMeter(){
+  const progress = getLS('progressData', {
+    totalQuestionsDone: 0,
+    ankiToday: 0,
+    faTotal: 0,
+    bootcampToday: '',
+    mehlmanToday: '',
+    pathomaToday: '',
+    sketchyMicroToday: '',
+    sketchyPharmToday: '',
+    dmToday: '',
+    nbmeReviewToday: ''
+  });
+
+  const loops = getLS('loops', []);
+  const weaknesses = getLS('weaknesses', []);
+
+  let score = 20;
+
+  const hours = parseFloat(document.getElementById('hoursAvailable')?.value || '0');
+  if (hours >= 8) score += 10;
+  else if (hours >= 5) score += 5;
+
+  if ((progress.totalQuestionsDone || 0) > 0) score += 15;
+  if ((progress.ankiToday || 0) >= 200) score += 15;
+  if ((progress.faTotal || 0) > 0) score += 8;
+  if (progress.bootcampToday || progress.mehlmanToday || progress.pathomaToday) score += 10;
+  if (progress.sketchyMicroToday || progress.sketchyPharmToday || progress.dmToday) score += 10;
+  if (progress.nbmeReviewToday) score += 7;
+
+  const repaired = loops.filter(x => x.status === 'Repaired').length;
+  score += Math.min(10, repaired * 2);
+
+  score -= Math.min(15, weaknesses.length * 2);
+
+  score = Math.max(15, Math.min(95, score));
+
+  let label = 'Fragile but moving';
+  if (score >= 80) label = 'Strong';
+  else if (score >= 65) label = 'Steady';
+  else if (score >= 50) label = 'Building';
+
+  document.getElementById('confidenceLabel').textContent = `${label} (${score}%)`;
+  document.getElementById('confidenceBar').style.width = score + '%';
+}
 
   function resetTodayPlan(){
     saveLS('plannerInputs', {});
@@ -1497,25 +1562,34 @@ Do the next block only.`;
   }
 
   function addWeakness(){
-    const entry = {
-      system: weakSystem.value,
-      discipline: weakDiscipline.value,
-      type: weakType.value,
-      contrast: contrastPair.value,
-      note: weakNote.value
-    };
-    const data = getLS('weaknesses', []);
-    data.push(entry);
-    saveLS('weaknesses', data);
+  const entry = {
+    system: weakSystem.value,
+    discipline: weakDiscipline.value,
+    type: weakType.value,
+    contrast: contrastPair.value,
+    note: weakNote.value
+  };
 
-    weakDiscipline.value = '';
-    contrastPair.value = '';
-    weakNote.value = '';
+  const data = getLS('weaknesses', []);
+  data.push(entry);
+  saveLS('weaknesses', data);
 
-    renderWeaknesses();
-    renderPatterns();
-    initHeader();
-  }
+  const loops = getLS('loops', []);
+  loops.push({
+    topic: `${entry.system}: ${entry.discipline || 'review details'}`,
+    status: 'Weak'
+  });
+  saveLS('loops', loops);
+
+  weakDiscipline.value = '';
+  contrastPair.value = '';
+  weakNote.value = '';
+
+  renderWeaknesses();
+  renderPatterns();
+  renderLoops();
+  initHeader();
+}
 
   function resetWeaknesses(){
     saveLS('weaknesses', []);
@@ -1719,6 +1793,7 @@ Not for:
     loadProgressToInputs();
     renderProgressBars();
     renderStreaks();
+    updateConfidenceMeter();
   })();
 
   function loadProgressToInputs(){
